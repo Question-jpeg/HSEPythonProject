@@ -6,9 +6,12 @@ import traceback
 from components.LoggerWindow import Logger
 
 class Service:
-    def __init__(self, logger: Logger):
+    def __init__(self, logger: Logger, cache_path: str, buy_book_path: str, rent_book_path: str):        
         self.logger = logger
-        self.executor = Executor(logger=logger)
+        self.cache_path = cache_path
+        self.buy_book_path = buy_book_path
+        self.rent_book_path = rent_book_path
+        self.executor = Executor(logger=logger, cache_path=cache_path)
 
     def main(self):
         try:
@@ -16,7 +19,7 @@ class Service:
 
             # DECLARATION
             config = configparser.ConfigParser()
-            config.read('cache.ini', encoding="utf-8")
+            config.read(self.cache_path, encoding="utf-8")
 
             iterations = [
                 {
@@ -169,8 +172,8 @@ class Service:
                 },
             ]
 
-            saleExcelWorker = ExcelWorker('Купить')
-            rentExcelWorker = ExcelWorker('Снять')
+            saleExcelWorker = ExcelWorker(self.buy_book_path)
+            rentExcelWorker = ExcelWorker(self.rent_book_path)
 
             for iteration in iterations:
                 self.executor.makeRow(config, iteration, saleExcelWorker, rentExcelWorker)

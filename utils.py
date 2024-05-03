@@ -1,3 +1,6 @@
+import os
+import sys
+
 import requests
 from requests.models import PreparedRequest
 from bs4 import BeautifulSoup
@@ -9,8 +12,9 @@ import math
 from components.LoggerWindow import Logger
 
 class Utils:
-    def __init__(self, logger: Logger):
+    def __init__(self, logger: Logger, cache_path: str):        
         self.logger = logger
+        self.cache_path = cache_path
 
     def getParams(self, config):
         params = {}
@@ -169,12 +173,12 @@ class Utils:
 
     def saveToCache(self, config: ConfigParser, sectionName, propertyName, avg):
         config[sectionName][propertyName] = avg
-        with open('cache.ini', 'w', encoding="utf-8") as file:
+        with open(self.cache_path, 'w', encoding="utf-8") as file:
             config.write(file)
 
 class ExcelWorker:
     def __init__(self, fileName) -> None:
-        self.workBook = openpyxl.load_workbook(f'{fileName}.xlsx')
+        self.workBook = openpyxl.load_workbook(fileName)
         self.fileName = fileName
 
     def createRow(self, options, sheetName):
@@ -209,7 +213,7 @@ class ExcelWorker:
         self.current_column = self.current_column + count
 
     def save(self):
-        self.workBook.save(f'{self.fileName}.xlsx')
+        self.workBook.save(self.fileName)
 
     def close(self):
         self.workBook.close()

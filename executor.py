@@ -5,8 +5,8 @@ import traceback
 from components.LoggerWindow import Logger
 
 class Executor:
-    def __init__(self, logger: Logger):
-        self.utils = Utils(logger=logger)
+    def __init__(self, logger: Logger, cache_path: str):
+        self.utils = Utils(logger=logger, cache_path=cache_path)
         self.logger = logger
         self.urlParamMapping = {
             'до метро (мин)': {'urlParam': 'foot_min', 'filter': True},

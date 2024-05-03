@@ -14,10 +14,14 @@ from main import Service
 from multiprocessing import Process, Queue
 
 class App(ctk.CTk):
-    def __init__(self, form_config, config_path: str):
+    def __init__(self, form_config, config_path: str, cache_path: str, buy_book_path: str, rent_book_path: str):
         super().__init__()
         self.form_config = form_config
         self.config_path = config_path
+        self.cache_path = cache_path
+        self.buy_book_path = buy_book_path
+        self.rent_book_path = rent_book_path
+
         self.sliders: Dict[str, CTkRangeSlider] = {}
         self.checkbox_frames: Dict[str, CheckBoxListFrame] = {}
 
@@ -96,7 +100,12 @@ class App(ctk.CTk):
         queue = Queue()        
         logger = Logger(queue)
 
-        self.p = Process(target=Service(logger=logger).main)        
+        self.p = Process(
+            target=Service(
+                logger=logger, cache_path=self.cache_path, 
+                buy_book_path=self.buy_book_path, rent_book_path=self.rent_book_path
+            ).main
+        )        
                     
         self.logger_component = LoggerWindow(self, queue)
         self.logger_component.grab_set()
@@ -125,7 +134,7 @@ class App(ctk.CTk):
 
     def updateIni(self, settings):
         config = configparser.ConfigParser()        
-        config.read("cache.ini")
+        config.read(self.cache_path)
 
         sliders = settings['sliders']
         cur_section = 'ОБЩИЕ'
@@ -173,7 +182,7 @@ class App(ctk.CTk):
             if len(combined) != 0:
                 config.set(cur_section, combined_name, ' '.join(combined))
 
-        with open("cache.ini", 'w') as file:
+        with open(self.cache_path, 'w') as file:
             config.write(file)
 
     def load_settings(self):
@@ -323,4 +332,4 @@ if __name__ == "__main__":
         "checkbox_frames": checkbox_frames
     }
 
-    App(form, 'config.json').mainloop()
+    App(form, 'config.json', 'cache.ini', 'Купить.xlsx', 'Снять.xlsx').mainloop()
