@@ -1,5 +1,4 @@
-import os
-import sys
+import time
 
 import requests
 from requests.models import PreparedRequest
@@ -33,24 +32,12 @@ class Utils:
 
         req = PreparedRequest()
         req.prepare_url(url, params)
-        count = 2
-        while True:
-            try:
-                response = requests.get(url=req.url.replace('%25', '%'))
-                # response = requests.get(
-                #     url='https://proxy.scrapeops.io/v1/',
-                #     params={
-                #         'api_key': 'badc2afe-6a80-44e1-a995-c3764685e50b',
-                #         'url': req.url.replace('%25', '%'),
-                #     },
-                # )
-                if response.ok:
-                    self.logger.println(f'Ответ получен [{response.status_code}]')
-                    break
-            except:
-                self.logger.println('Ошибка подключения к прокси')    
-            self.logger.println(f'Попытка №{count}')
-            count += 1
+        while True:  
+            time.sleep(3)                      
+            response = requests.get(url=req.url.replace('%25', '%'))
+            if response.ok:
+                self.logger.println(f'Ответ получен [{response.status_code}]')
+                break
         
         return response
 
